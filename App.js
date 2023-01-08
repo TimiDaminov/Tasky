@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, StyleSheet, Text, Modal } from "react-native";
+import ModalAddTask from "./components/ModalAddTask";
+import MyButton from "./components/UI/MyButton";
+import "react-native-get-random-values";
+import NoteItem from "./components/NoteItem";
+import { v4 as uuid } from "uuid";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
@@ -7,39 +12,31 @@ const App = () => {
   const [visibleModal, setVisibleModal] = useState(false);
 
   const addNote = () => {
-    setNotes([...notes, currentNote]);
-    setVisibleModal(false);
-    setCurrentNote("");
+    if (currentNote.length > 0) {
+      setNotes([...notes, { text: currentNote, id: uuid() }]);
+      setVisibleModal(false);
+      setCurrentNote("");
+      console.log(notes);
+    }
   };
 
   return (
     <View style={styles.appContainer}>
-      <Button onPress={() => setVisibleModal(true)} title="Add Note" />
-      <Button onPress={() => setNotes([])} title="clear" />
+      <View style={styles.appHead}>
+        <MyButton onPress={() => setVisibleModal(true)}>Add Task</MyButton>
+      </View>
+      <MyButton onPress={() => setNotes([])}>Clear</MyButton>
       {notes.map((note, index) => (
-        <View key={index}>
-          <Text style={styles.notesItem}>
-            {index + 1}){note}
-          </Text>
-        </View>
+        <NoteItem index={index} note={note} />
       ))}
 
-      {/* Modal Window  */}
-
-      <Modal animationType="slide" transparent={false} visible={visibleModal}>
-        <View style={styles.modalContainer}>
-          <TextInput
-            value={currentNote}
-            onChangeText={(text) => setCurrentNote(text)}
-            placeholder="Your Task..."
-            style={styles.noteAddInput}
-          />
-          <Button onPress={() => setVisibleModal(false)} title="close" />
-          <Button onPress={addNote} title="Add note" />
-        </View>
-      </Modal>
-
-      {/* modal window ends */}
+      <ModalAddTask
+        visibleModal={visibleModal}
+        currentNote={currentNote}
+        setCurrentNote={setCurrentNote}
+        setVisibleModal={setVisibleModal}
+        addNote={addNote}
+      />
     </View>
   );
 };
@@ -48,26 +45,15 @@ export default App;
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#F8F4EA",
+    padding: 10,
   },
 
-  notesItem: {
-    fontSize: 28,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  noteAddInput: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 14,
-    marginBottom: 10,
+  appHead: {
+    paddingTop: 60,
+    alignItems: "flex-end",
+    paddingRight: 20,
+    backgroundColor: "#F8F4EA",
+    paddingBottom: 20,
   },
 });
